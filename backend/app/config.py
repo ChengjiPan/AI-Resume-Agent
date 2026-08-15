@@ -10,11 +10,19 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 load_dotenv(PROJECT_ROOT / "backend" / ".env")
 
+# Vercel functions can only write to /tmp. On a local or Render deployment we
+# keep the original project-local location instead.
+DEFAULT_CHROMA_DIR = (
+    Path("/tmp") / "ai_resume_chroma"
+    if os.getenv("VERCEL")
+    else PROJECT_ROOT / "backend" / "data" / "chroma"
+)
+
 
 @dataclass(frozen=True)
 class Settings:
     knowledge_dir: Path = PROJECT_ROOT / "knowledge"
-    chroma_dir: Path = PROJECT_ROOT / "backend" / "data" / "chroma"
+    chroma_dir: Path = Path(os.getenv("CHROMA_DIR", str(DEFAULT_CHROMA_DIR)))
     collection_name: str = "resume_knowledge"
     embedding_model: str = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
     chat_model: str = os.getenv("OPENAI_CHAT_MODEL", "gpt-4.1-mini")
