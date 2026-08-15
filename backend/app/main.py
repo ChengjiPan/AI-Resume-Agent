@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from app.config import settings
-from app.schemas import ChatRequest, ChatResponse, IndexResponse, SourceItem
-from app.services.rag import answer_question, index_knowledge_base
+from app.schemas import ChatRequest, ChatResponse, SourceItem
+from app.services.rag import answer_question
 
 
 app = FastAPI(title="AI Resume Assistant API", version="0.1.0")
@@ -30,17 +30,6 @@ def home() -> FileResponse:
 @app.get("/health")
 def health() -> dict[str, bool]:
     return {"ok": True, "api_key_configured": settings.has_api_key}
-
-
-@app.post("/api/index", response_model=IndexResponse)
-def index() -> IndexResponse:
-    if not settings.has_api_key:
-        raise HTTPException(500, "OPENAI_API_KEY is not configured.")
-    try:
-        documents, chunks = index_knowledge_base(settings)
-        return IndexResponse(documents_indexed=documents, chunks_indexed=chunks)
-    except Exception as error:
-        raise HTTPException(500, str(error)) from error
 
 
 @app.post("/api/chat", response_model=ChatResponse)

@@ -12,6 +12,7 @@ __pycache__/
 # JavaScript dependencies and build outputs
 frontend/node_modules/
 frontend/.next/
+.vercel-tools/
 
 # Editor and operating-system files
 .DS_Store
