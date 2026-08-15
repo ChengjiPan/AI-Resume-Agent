@@ -1,10 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "includeFiles": [
-        "backend/**",
-        "knowledge/**"
-      ],
+      "includeFiles": "{backend,knowledge}/**",
       "maxDuration": 60
     }
   }
