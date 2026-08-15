@@ -43,7 +43,9 @@ def _store_exists(chroma_dir: Path) -> bool:
 
 def answer_question(question: str, settings: Settings) -> tuple[str, list[dict[str, str | None]]]:
     if not _store_exists(settings.chroma_dir):
-        raise RuntimeError("Knowledge base is not indexed. Call POST /api/index first.")
+        # Free hosting instances can restart and lose local vector data. The source
+        # Markdown remains bundled with the app, so rebuild on the first question.
+        index_knowledge_base(settings)
     store = Chroma(
         collection_name=settings.collection_name,
         persist_directory=str(settings.chroma_dir),

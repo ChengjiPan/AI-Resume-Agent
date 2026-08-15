@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from app.config import settings
 from app.schemas import ChatRequest, ChatResponse, IndexResponse, SourceItem
@@ -14,6 +17,14 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
+
+WEB_PAGE = Path(__file__).resolve().parent / "static" / "index.html"
+
+
+@app.get("/", include_in_schema=False)
+def home() -> FileResponse:
+    """Serve the recruiter-facing chat page from the same origin as the API."""
+    return FileResponse(WEB_PAGE)
 
 
 @app.get("/health")
