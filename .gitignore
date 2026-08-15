@@ -1,0 +1,18 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python runtime and generated vector data
+backend/.venv/
+backend/data/chroma/
+__pycache__/
+*.py[cod]
+
+# JavaScript dependencies and build outputs
+frontend/node_modules/
+frontend/.next/
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
