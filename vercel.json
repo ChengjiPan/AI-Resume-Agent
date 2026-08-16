@@ -4,5 +4,12 @@
       "includeFiles": "{backend,knowledge}/**",
       "maxDuration": 300
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index.py"
+    }
+  ]
 }
+
