@@ -21,6 +21,10 @@ def _embeddings(settings: Settings) -> OpenAIEmbeddings:
         model=settings.embedding_model,
         api_key=settings.api_key,
         base_url=settings.base_url,
+        # DashScope accepts source text, not LangChain's pre-tokenized integer arrays.
+        check_embedding_ctx_length=False,
+        # text-embedding-v4 accepts at most 10 strings per request.
+        chunk_size=10,
     )
 
 
