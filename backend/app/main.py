@@ -35,7 +35,7 @@ def health() -> dict[str, bool]:
 @app.post("/api/chat", response_model=ChatResponse)
 def chat(request: ChatRequest) -> ChatResponse:
     if not settings.has_api_key:
-        raise HTTPException(500, "OPENAI_API_KEY is not configured.")
+        raise HTTPException(500, "DASHSCOPE_API_KEY is not configured.")
     try:
         answer, sources = answer_question(request.question, settings)
         return ChatResponse(answer=answer, sources=[SourceItem(**source) for source in sources])
@@ -43,3 +43,4 @@ def chat(request: ChatRequest) -> ChatResponse:
         raise HTTPException(409, str(error)) from error
     except Exception as error:
         raise HTTPException(500, str(error)) from error
+
