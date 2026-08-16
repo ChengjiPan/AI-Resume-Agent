@@ -17,7 +17,11 @@ SYSTEM_PROMPT = """你是 Calvin AI Resume Assistant。只根据提供的个人�
 
 
 def _embeddings(settings: Settings) -> OpenAIEmbeddings:
-    return OpenAIEmbeddings(model=settings.embedding_model)
+    return OpenAIEmbeddings(
+        model=settings.embedding_model,
+        api_key=settings.api_key,
+        base_url=settings.base_url,
+    )
 
 
 def index_knowledge_base(settings: Settings) -> tuple[int, int]:
@@ -55,7 +59,12 @@ def answer_question(question: str, settings: Settings) -> tuple[str, list[dict[s
     if not passages:
         return "现有知识库中没有找到足够相关的资料。", []
     context = "\n\n".join(f"[来源：{doc.metadata.get('file')}]\n{doc.page_content}" for doc in passages)
-    response = ChatOpenAI(model=settings.chat_model, temperature=0.2).invoke(
+    response = ChatOpenAI(
+        model=settings.chat_model,
+        temperature=0.2,
+        api_key=settings.api_key,
+        base_url=settings.base_url,
+    ).invoke(
         [SystemMessage(content=SYSTEM_PROMPT), HumanMessage(content=f"知识库：\n{context}\n\n问题：{question}")]
     )
     sources = [
