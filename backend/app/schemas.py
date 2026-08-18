@@ -8,6 +8,7 @@ class ChatRequest(BaseModel):
 class SourceItem(BaseModel):
     file: str
     section: str | None = None
+    excerpt: str | None = None
 
 
 class ChatResponse(BaseModel):
