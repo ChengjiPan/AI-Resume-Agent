@@ -12,8 +12,17 @@ from app.services.documents import chunk_documents, load_markdown_documents
 
 
 SYSTEM_PROMPT = """你是 Calvin AI Resume Assistant。只根据提供的个人知识库回答。
-如果资料不足、存在版本冲突或无法确认，请明确说明，不要编造。
-回答使用中文，优先说明项目背景、候选人角色、方法、结果与产品价值；保持简洁、适合招聘经理阅读。"""
+如果资料不足、存在版本冲突或无法确认，请明确说明，不要编造，也不要补充知识库中没有的数据、职责或结论。
+
+当问题涉及某一段具体实习或项目时，必须使用下面的六项结构；没有资料的项目要明确写“资料未提供”：
+1. 项目背景
+2. 我的角色
+3. 我的任务
+4. 使用的方法
+5. 数据结果
+6. 产品价值
+
+当问题是能力、教育或职业优势等概述类问题时，使用清晰的要点回答，并把每项判断和已提供资料对应。回答使用中文，简洁、专业、适合招聘经理阅读。"""
 
 
 def _embeddings(settings: Settings) -> OpenAIEmbeddings:
@@ -72,9 +81,20 @@ def answer_question(question: str, settings: Settings) -> tuple[str, list[dict[s
         [SystemMessage(content=SYSTEM_PROMPT), HumanMessage(content=f"知识库：\n{context}\n\n问题：{question}")]
     )
     sources = [
-        {"file": str(doc.metadata.get("file", "未知文件")), "section": doc.metadata.get("section")}
+        {
+            "file": str(doc.metadata.get("file", "未知文件")),
+            "section": doc.metadata.get("section"),
+            # A short original excerpt lets the recruiter verify that the answer
+            # is grounded without exposing the whole knowledge-base document.
+            "excerpt": " ".join(doc.page_content.split())[:220],
+        }
         for doc in passages
     ]
-    unique_sources = list({(item["file"], item["section"]): item for item in sources}.values())
+    unique_sources = []
+    seen_sources = set()
+    for item in sources:
+        identity = (item["file"], item["section"])
+        if identity not in seen_sources:
+            unique_sources.append(item)
+            seen_sources.add(identity)
     return str(response.content), unique_sources
-
